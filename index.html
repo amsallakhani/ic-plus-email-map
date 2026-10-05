@@ -1,0 +1,606 @@
+<title>IC+ Email Migration Map</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    --bg: #fafaf9; --surface: #ffffff; --text-1: #1a1917; --text-2: #6b6960; --text-3: #9c978c;
+    --border: #e5e2db; --border-light: #f0eee9;
+    --green: #16803c; --green-bg: #ecfdf3;
+    --amber: #b45309; --amber-bg: #fef9ec;
+    --blue: #2563eb; --blue-bg: #eff6ff;
+    --red: #dc2626; --red-bg: #fef2f2;
+    --purple: #6828a0; --purple-bg: #f5f0fa;
+    --shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg: #141413; --surface: #1e1e1c; --text-1: #eae9e6; --text-2: #9c9890; --text-3: #6b6860;
+    --border: #2e2d2a; --border-light: #262523;
+    --green: #4ade80; --green-bg: #0f2318; --amber: #fbbf24; --amber-bg: #261e0a;
+    --blue: #60a5fa; --blue-bg: #0f1a2e; --red: #f87171; --red-bg: #2a1010;
+    --purple: #c084fc; --purple-bg: #1e1228; --shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }}
+  :root[data-theme="dark"] {
+    --bg: #141413; --surface: #1e1e1c; --text-1: #eae9e6; --text-2: #9c9890; --text-3: #6b6860;
+    --border: #2e2d2a; --border-light: #262523;
+    --green: #4ade80; --green-bg: #0f2318; --amber: #fbbf24; --amber-bg: #261e0a;
+    --blue: #60a5fa; --blue-bg: #0f1a2e; --red: #f87171; --red-bg: #2a1010;
+    --purple: #c084fc; --purple-bg: #1e1228; --shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+
+  body { background: var(--bg); color: var(--text-1); font-family: 'Inter', system-ui, sans-serif; }
+  .page { max-width: 1400px; margin: 0 auto; padding: 32px 20px 64px; }
+  h1 { font-family: 'DM Sans', sans-serif; font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: var(--text-2); font-size: 14px; margin-bottom: 28px; line-height: 1.5; }
+  .subtitle a { color: var(--purple); text-decoration: none; }
+  .subtitle a:hover { text-decoration: underline; }
+
+  .stats-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; box-shadow: var(--shadow); flex: 1; min-width: 110px; }
+  .stat-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); margin-bottom: 3px; }
+  .stat-value { font-size: 20px; font-weight: 700; font-family: 'DM Sans', sans-serif; font-variant-numeric: tabular-nums; }
+  .stat-value.green { color: var(--green); } .stat-value.amber { color: var(--amber); }
+  .stat-value.blue { color: var(--blue); } .stat-value.red { color: var(--red); }
+
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; font-size: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .legend-dot.done { background: var(--green); } .legend-dot.updated { background: var(--blue); }
+  .legend-dot.blank { background: var(--amber); } .legend-dot.missing { background: var(--red); }
+
+  .milestone-section { margin-bottom: 40px; }
+  .milestone-header { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 16px; }
+  .milestone-header .pill { font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .milestone-header.m1 { background: var(--green-bg); color: var(--green); }
+  .milestone-header.m1 .pill { background: var(--green); color: #fff; }
+  .milestone-header.m2 { background: var(--amber-bg); color: var(--amber); }
+  .milestone-header.m2 .pill { background: var(--amber); color: #fff; }
+  .milestone-header.m3 { background: var(--blue-bg); color: var(--blue); }
+  .milestone-header.m3 .pill { background: var(--blue); color: #fff; }
+  .milestone-header.other { background: var(--purple-bg); color: var(--purple); }
+  .milestone-header.other .pill { background: var(--purple); color: #fff; }
+  .milestone-desc { font-weight: 400; font-size: 12px; text-transform: none; letter-spacing: 0; opacity: 0.8; margin-left: auto; }
+
+  .email-grid { display: flex; flex-direction: column; gap: 20px; }
+  .email-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; }
+  .email-card-header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 16px; border-bottom: 1px solid var(--border-light); }
+  .email-card-name { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 14px; font-weight: 700; }
+  .email-card-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-left: auto; }
+
+  .email-card-body { display: grid; grid-template-columns: 1fr; gap: 0; }
+  .email-card-details { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--border-light); }
+
+  .screenshots-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  @media (max-width: 700px) { .screenshots-row { grid-template-columns: 1fr; } }
+  .screenshot-col { padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; background: var(--border-light); }
+  .screenshot-col + .screenshot-col { border-left: 1px solid var(--border); }
+  .screenshot-col-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); }
+  .screenshot-col-label.v3 { color: var(--text-3); }
+  .screenshot-col-label.v4 { color: var(--purple); }
+  .screenshot-col img { max-width: 100%; max-height: 500px; border-radius: 4px; box-shadow: 0 1px 6px rgba(0,0,0,0.08); cursor: pointer; }
+  .no-screenshot { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 32px; text-align: center; font-size: 12px; font-weight: 600; min-height: 160px; }
+  .no-screenshot.red { color: var(--red); }
+  .no-screenshot.amber { color: var(--amber); }
+
+  .detail-row { display: flex; gap: 8px; font-size: 13px; line-height: 1.5; }
+  .detail-label { font-weight: 600; color: var(--text-3); min-width: 70px; flex-shrink: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; padding-top: 2px; }
+  .detail-value { color: var(--text-1); }
+
+  .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
+  .badge-done { background: var(--green-bg); color: var(--green); }
+  .badge-updated { background: var(--blue-bg); color: var(--blue); }
+  .badge-blank { background: var(--amber-bg); color: var(--amber); }
+  .badge-missing { background: var(--red-bg); color: var(--red); }
+  .badge-vol { background: var(--purple-bg); color: var(--purple); font-variant-numeric: tabular-nums; }
+  .badge-new { background: var(--blue-bg); color: var(--blue); }
+  .badge-gate { background: var(--red-bg); color: var(--red); }
+
+  .see-key { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 11px; color: var(--text-2); background: var(--border-light); padding: 2px 6px; border-radius: 4px; }
+  .priority-tag { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .p1 { background: var(--red-bg); color: var(--red); }
+  .p2 { background: var(--amber-bg); color: var(--amber); }
+
+  .footnotes { margin-top: 32px; font-size: 12px; color: var(--text-3); line-height: 1.6; }
+  .footnotes p { margin-bottom: 6px; }
+  .footnotes strong { color: var(--text-2); }
+  .sources { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-3); }
+  .sources a { color: var(--purple); text-decoration: none; }
+  .sources a:hover { text-decoration: underline; }
+</style>
+
+<div class="page">
+  <h1>IC+ Transactional Email Migration Map</h1>
+  <div class="subtitle">
+    V3→V4 email migration: V3 screenshot + V4 Figma design side-by-side, trigger timing, weekly volume, and copy status.<br>
+    <a href="https://drive.google.com/drive/u/0/folders/1OP0AJLqC4an_wxtLVqiD2zTas1ETbO1D">V3 Screenshots</a> ·
+    <a href="https://www.figma.com/design/nzhkBUCl2sV3wLbiFcIVl4/Transactional-emails-2.0?node-id=1885-24375&m=dev">Figma V4 Designs</a> ·
+    <a href="https://instacart.atlassian.net/wiki/spaces/Platform/pages/7177633817">SEE Blocker Doc</a>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-label">Total emails</div><div class="stat-value">22</div></div>
+    <div class="stat-card"><div class="stat-label">M1 · Done</div><div class="stat-value green">4</div></div>
+    <div class="stat-card"><div class="stat-label">M2 · In-flight</div><div class="stat-value amber">4</div></div>
+    <div class="stat-card"><div class="stat-label">M3 · Next</div><div class="stat-value blue">7</div></div>
+    <div class="stat-card"><div class="stat-label">Not in Figma</div><div class="stat-value red">7</div></div>
+    <div class="stat-card"><div class="stat-label">V4 blank</div><div class="stat-value" style="color:var(--amber)">2</div></div>
+    <div class="stat-card"><div class="stat-label">No V3 screenshot</div><div class="stat-value red">3</div></div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot done"></span> V4 done — final copy, launched</div>
+    <div class="legend-item"><span class="legend-dot updated"></span> V4 design done — copy updated, not launched</div>
+    <div class="legend-item"><span class="legend-dot blank"></span> V4 frame exists — blank, no design</div>
+    <div class="legend-item"><span class="legend-dot missing"></span> Not in Figma at all</div>
+  </div>
+
+  <!-- =================== M1 DONE =================== -->
+  <div class="milestone-section">
+    <div class="milestone-header m1"><span class="pill">Done</span> M1 — Trial Lifecycle <span class="milestone-desc">membership_v4_emails_migration_m1 · Launched</span></div>
+    <div class="email-grid">
+
+      <!-- start_trial -->
+      <div class="email-card">
+        <div class="email-card-header">
+          <span class="email-card-name">start_trial</span>
+          <div class="email-card-meta"><span class="badge badge-done">✓ V4 Done</span></div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-card-details">
+            <div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-value"><strong>On sign-up.</strong> Welcome email with benefit list, auto-renew disclosure, trial end date.</span></div>
+            <div class="detail-row"><span class="detail-label">V4 Copy</span><span class="detail-value">✅ Final — "Your Instacart+ trial starts now". Benefits, $0 delivery, Peacock, NYT Cooking, Family. Auto-renew disclosure with [$9.99/mo] variable.</span></div>
+          </div>
+          <div class="screenshots-row">
+            <div class="screenshot-col"><span class="screenshot-col-label v3">V3 Current</span><a href="https://drive.google.com/file/d/1Jd8938gkG-lXS4SQUt6gt8meCxi1Vc7P/view" target="_blank"><img src="https://lh3.googleusercontent.com/d/1Jd8938gkG-lXS4SQUt6gt8meCxi1Vc7P" alt="V3 start_trial" loading="lazy"></a></div>
+            <div class="screenshot-col"><span class="screenshot-col-label v4">V4 Figma</span><img src="v4/m1_start_trial_body.png" alt="V4 start_trial" loading="lazy"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- end_trial_autorenew -->
+      <div class="email-card">
+        <div class="email-card-header">
+          <span class="email-card-name">end_trial_autorenew</span>
+          <div class="email-card-meta"><span class="badge badge-done">✓ V4 Done</span></div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-card-details">
+            <div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-value"><strong>7 days before trial ends</strong> (7 AM PT daily). Autorenew ON, valid card, savings &lt; $30.</span></div>
+            <div class="detail-row"><span class="detail-label">V4 Copy</span><span class="detail-value">✅ Final — Renewal date, $99 price, benefits, cancel path. Figma label: "Trial - Autorenew on with valid payment".</span></div>
+          </div>
+          <div class="screenshots-row">
+            <div class="screenshot-col"><span class="screenshot-col-label v3">V3 Current</span><a href="https://drive.google.com/file/d/1lgAbRgrH9t9AgPDnSVlEFDOxQPmbpE2M/view" target="_blank"><img src="https://lh3.googleusercontent.com/d/1lgAbRgrH9t9AgPDnSVlEFDOxQPmbpE2M" alt="V3 end_trial_autorenew" loading="lazy"></a></div>
+            <div class="screenshot-col"><span class="screenshot-col-label v4">V4 Figma</span><img src="v4/m1_end_trial_autorenew_body.png" alt="V4 end_trial_autorenew" loading="lazy"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- inactive_card (trial) -->
+      <div class="email-card">
+        <div class="email-card-header">
+          <span class="email-card-name">inactive_card</span> <span style="font-size:12px;color:var(--text-2)">(trial)</span>
+          <div class="email-card-meta"><span class="badge badge-done">✓ V4 Done</span></div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-card-details">
+            <div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-value"><strong>2–3 days before trial ends.</strong> Autorenew ON, card invalid or missing.</span></div>
+            <div class="detail-row"><span class="detail-label">V4 Copy</span><span class="detail-value">✅ Final — "Update your payment method to keep saving". Steps to update, benefits list. Figma: "Trial - Autorenew on with invalid payment".</span></div>
+          </div>
+          <div class="screenshots-row">
+            <div class="screenshot-col"><span class="screenshot-col-label v3">V3 Current</span><a href="https://drive.google.com/file/d/1SGokrVkKjrBoPOvr24l1lvuig0GcdP-k/view" target="_blank"><img src="https://lh3.googleusercontent.com/d/1SGokrVkKjrBoPOvr24l1lvuig0GcdP-k" alt="V3 inactive_card trial" loading="lazy"></a></div>
+            <div class="screenshot-col"><span class="screenshot-col-label v4">V4 Figma</span><img src="v4/m1_inactive_card_trial_body.png" alt="V4 inactive_card trial" loading="lazy"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- end_trial -->
+      <div class="email-card">
+        <div class="email-card-header">
+          <span class="email-card-name">end_trial</span>
+          <div class="email-card-meta"><span class="badge badge-done">✓ V4 Done</span></div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-card-details">
+            <div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-value"><strong>Before trial end date.</strong> Autorenew OFF. Prompts user to add payment method.</span></div>
+            <div class="detail-row"><span class="detail-label">V4 Copy</span><span class="detail-value">✅ Final — "Keep Instacart+" CTA, benefits, end date shown. Figma: "Trial - Autorenew off".</span></div>
+          </div>
+          <div class="screenshots-row">
+            <div class="screenshot-col"><span class="screenshot-col-label v3">V3 Current</span><a href="https://drive.google.com/file/d/1M7dT70EX0kOxIKVJ18UvG9Nx9xl0o35b/view" target="_blank"><img src="https://lh3.googleusercontent.com/d/1M7dT70EX0kOxIKVJ18UvG9Nx9xl0o35b" alt="V3 end_trial" loading="lazy"></a></div>
+            <div class="screenshot-col"><span class="screenshot-col-label v4">V4 Figma</span><img src="v4/m1_end_trial_body.png" alt="V4 end_trial" loading="lazy"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =================== M2 IN-FLIGHT =================== -->
+  <div class="milestone-section">
+    <div class="milestone-header m2"><span class="pill">In-flight</span> M2 — Paid Start + Confirmations <span class="milestone-desc">membership_v4_emails_migration_m2_r1 · Not launched</span></div>
+    <div class="email-grid">
+
+      <!-- start_paid -->
+      <div class="email-card">
+        <div class="email-card-header">
+          <span class="email-card-name">start_paid</span>
+          <div class="email-card-meta"><span class="badge badge-updated">✓ V4 Updated</span></div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-card-details">
+            <div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-value"><strong>On paid sign-up.</strong> Payment receipt + membership confirmation.</span></div>
+            <div class="detail-row"><span class="detail-label">V4 Copy</span><span class="detail-value">✅ Updated — "Your savings are just getting started". Payment receipt, Peacock + NYT Cooking activation CTAs, renewal date/price disclosure, cancel path.</span></div>
+            <div class="detail-row"><span class="detail-label">Figma</span><span class="detail-value">D2P welcome email - NYT eligible + Peacock eligible</span></div>
+          </div>
+          <div class="screenshots-row">
+            <div class="screenshot-col"><span class="screenshot-col-label v3">V3 Current</span><a href="https://drive.google.com/file/d/1ks-Cgk1h-NWy497qa-2tFr67L8YyVtLw/view" target="_blank"><img src="https://lh3.googleusercontent.com/d/1ks-Cgk1h-NWy497qa-2tFr67L8YyVtLw" alt="V3 start_paid" loading="lazy"></a></div>
+            <div class="screenshot-col"><span class="screenshot-col-label v4">V4 Figma</span><img src="v4/m2_start_paid_body.png" alt="V4 start_paid" loading="lazy"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- past_renewal / paid renewal confirmation -->
+      <div class="email-card">
+        <div class="email-card-header">
+          <span class="email-card-name">past_renewal</span> <span style="font-size:12px;color:var(--text-2)">(paid renewal confirmation)</span>
+          <div class="email-card-meta"><span class="badge badge-updated">✓ V4 Updated</span></div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-card-details">
+            <div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-value"><strong>After renewal charge.</strong> Post-renewal payment receipt + next renewal date.</span></div>
+            <div class="detail-row"><span class="detail-label">V4 Copy</span><span class="detail-value">✅ Updated — "Thanks for being a loyal Instacart+ member". Receipt, Peacock + NYT activation CTAs, next renewal date/price, cancel path.</span></div>
+            <div class="detail-row"><span class="detail-label">Figma</span><span class="detail-value">Paid renewal confirmation - NYT eligible + Peacock eligible</span></div>
+          </div>
+          <div class="screenshots-row">
+            <div class="screenshot-col"><span class="screenshot-col-label v3">V3 Current</span><a href="https://drive.google.com/file/d/1ysk8G7q-yCGxAamYgmuDKEkfZSSItOrR/view" target="_blank"><img src="https://lh3.googleusercontent.com/d/1ysk8G7q-yCGxAamYgmuDKEkfZSSItOrR" alt="V3 past_renewal" loading="lazy"></a></div>
+            <div class="screenshot-col"><span class="screenshot-col-label v4">V4 Figma</span><img src="v4/m2_paid_renewal_confirm_body.png" alt="V4 paid renewal confirm" loading="lazy"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- successful_retry (NEW) -->
+      <div class="email-card">
+        <div class="email-card-header">
+          <span class="email-card-name">successful_retry</span>
+          <div class="email-card-meta"><span class="badge badge-new">✦ New in V4</span> <span class="badge badge-updated">✓ V4 Updated</span></div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-card-details">
+            <div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-value"><strong>After successful retry.</strong> Previously-declined card charge succeeds on retry. Payment receipt.</span></div>
+            <div class="detail-row"><span class="detail-label">V4 Copy</span><span class="detail-value">✅ Updated — "Your Instacart+ membership was successfully renewed". Receipt, Peacock + NYT CTAs, renewal disclosure, cancel path. <strong>No V3 equivalent.</strong></span></div>
+            <div class="detail-row"><span class="detail-label">Figma</span><span class="detail-value">Successful Retry</span></div>
+          </div>
+          <div class="screenshots-row">
+            <div class="screenshot-col"><span class="screenshot-col-label v3">V3 Current</span><div class="no-screenshot amber">No V3 equivalent — new email type</div></div>
+            <div class="screenshot-col"><span class="screenshot-col-label v4">V4 Figma</span><img src="v4/m2_successful_retry_body.png" alt="V4 successful retry" loading="lazy"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- cancel_trial -->
+      <div class="email-card">
+        <div class="email-card-header">
+          <span class="email-card-name">cancel_trial</span>
+          <div class="email-card-meta"><span class="badge badge-updated">✓ V4 Updated</span></div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-card-details">
+            <div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-value"><strong>Immediately</strong> on trial cancellation. Confirms no charge.</span></div>
+            <div class="detail-row"><span class="detail-label">V4 Copy</span><span class="detail-value">✅ Updated — "You've canceled your Instacart+ membership". Trial end date, "Keep Instacart+" CTA, benefits list, $0 delivery disclosure.</span></div>
+            <div class="detail-row"><span class="detail-label">Figma</span><span class="detail-value">Trial cancellation</span></div>
+          </div>
+          <div class="screenshots-row">
+            <div class="screenshot-col"><span class="screenshot-col-label v3">V3 Current</span><a href="https://drive.google.com/file/d/1BQLxKOs-GMrpKLJlEzP-ywuGQSNM_1LN/view" target="_blank"><img src="https://lh3.googleusercontent.com/d/1BQLxKOs-GMrpKLJlEzP-ywuGQSNM_1LN" alt="V3 cancel_trial" loading="lazy"></a></div>
+            <div class="screenshot-col"><span class="screenshot-col-label v4">V4 Figma</span><img src="v4/m2_cancel_trial_body.png" alt="V4 cancel_trial" loading="lazy"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =================== M3 NEXT =================== -->
+  <div class="milestone-section">
+    <div class="milestone-header m3"><span class="pill">Next</span> M3 — Paid Renewal, Cancel &amp; Card Issues <span class="milestone-desc">Not started · 5 of 7 designs done, 2 blank</span></div>
+    <div class="email-grid">
+
+      <!-- upcoming_renewal P1 -->
+      <div class="email-card" style="border-color: var(--red);">
+        <div class="email-card-header" style="background: var(--red-bg);">
+          <span class="email-card-name">upcoming_renewal</span>
+          <div class="email-card-meta">
+            <span class="priority-tag p1">P1 · Charge Gate</span>
+            <span class="badge badge-vol">~5,744/wk</span>
+            <span class="badge badge-updated">✓ V4 Updated</span>
+          </div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-card-details">
+            <div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-value"><strong>7 days before</strong> (7 AM PT) + <strong>30 days before</strong> (8 AM PT). Autorenew ON, valid card.</span></div>
+            <div class="detail-row"><span class="detail-label">V4 Copy</span><span class="detail-value">✅ Updated — "Your Instacart+ membership renews soon". Renewal date, price ($9.99 monthly shown), cancel path, benefits. Template variables for date/price.</span></div>
+            <div class="detail-row"><span class="detail-label">SEE Key</span><span class="detail-value"><span class="see-key">paid_renewal_autorenew_on</span> · ⚠ BLOCKER — SEE charge gate. Missing V4 template = TNS drops = SEE cancels renewal.</span></div>
+          </div>
+          <div class="screenshots-row">
+            <div class="screenshot-col"><span class="screenshot-col-label v3">V3 Current</span><a href="https://drive.google.com/file/d/1LTnjECJoABJEdvpsqR5sGTbcIvztgYGZ/view" target="_blank"><img src="https://lh3.googleusercontent.com/d/1LTnjECJoABJEdvpsqR5sGTbcIvztgYGZ" alt="V3 upcoming_renewal" loading="lazy"></a></div>
+            <div class="screenshot-col"><span class="screenshot-col-label v4">V4 Figma</span><img src="v4/m3_upcoming_renewal_body.png" alt="V4 upcoming_renewal" loading="lazy"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- inactive_card (paid) P1 -->
+      <div class="email-card" style="border-color: var(--red);">
+        <div class="email-card-header" style="background: var(--red-bg);">
+          <span class="email-card-name">inactive_card</span> <span style="font-size:12px;color:var(--text-2)">(paid)</span>
+          <div class="email-card-meta">
+            <span class="priority-tag p1">P1 · Charge Gate</span>
+            <span class="badge badge-vol">~77/wk</span>
+            <span class="badge badge-updated">✓ V4 Updated</span>
+          </div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-card-details">
+            <div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-value"><strong>2–3 days before renewal.</strong> Paid member, autorenew ON, card invalid/missing.</span></div>
+            <div class="detail-row"><span class="detail-label">V4 Copy</span><span class="detail-value">✅ Updated — "Update your payment method to keep saving". "Inactive card" badge, renewal date [XX/XX/XXXX], 3-step update flow, benefits. Figma: "Paid - inactive_card".</span></div>
+            <div class="detail-row"><span class="detail-label">SEE Key</span><span class="detail-value"><span class="see-key">paid_renewal_autorenew_on_invalid_payment</span> · ⚠ BLOCKER — Same charge gate as upcoming_renewal.</span></div>
+          </div>
+          <div class="screenshots-row">
+            <div class="screenshot-col"><span class="screenshot-col-label v3">V3 Current</span><a href="https://drive.google.com/file/d/1SGokrVkKjrBoPOvr24l1lvuig0GcdP-k/view" target="_blank"><img src="https://lh3.googleusercontent.com/d/1SGokrVkKjrBoPOvr24l1lvuig0GcdP-k" alt="V3 inactive_card paid" loading="lazy"></a></div>
+            <div class="screenshot-col"><span class="screenshot-col-label v4">V4 Figma</span><img src="v4/m3_inactive_card_paid_v2_body.png" alt="V4 inactive_card paid" loading="lazy"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- declined_card_new_strategy -->
+      <div class="email-card">
+        <div class="email-card-header">
+          <span class="email-card-name">declined_card_new_strategy</span>
+          <div class="email-card-meta">
+            <span class="badge badge-vol">~350/wk</span>
+            <span class="badge badge-updated">✓ V4 Updated</span>
+          </div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-card-details">
+            <div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-value"><strong>On renewal day</strong> when charge is declined. Retries daily for 4 weeks. Benefits lapse next day.</span></div>
+            <div class="detail-row"><span class="detail-label">V4 Copy</span><span class="detail-value">✅ Updated — "Update your payment method to keep saving". "Payment declined" badge, end date [XX/XX/XXXX], 3-step update flow, benefits. Figma: "Paid - Autorenew on with invalid payment".</span></div>
+          </div>
+          <div class="screenshots-row">
+            <div class="screenshot-col"><span class="screenshot-col-label v3">V3 Current</span><a href="https://drive.google.com/file/d/1dWQUoFHYjQ2swX4yZF_pnfaX9SAx-uul/view" target="_blank"><img src="https://lh3.googleusercontent.com/d/1dWQUoFHYjQ2swX4yZF_pnfaX9SAx-uul" alt="V3 declined_card_new_strategy" loading="lazy"></a></div>
+            <div class="screenshot-col"><span class="screenshot-col-label v4">V4 Figma</span><img src="v4/m3_inactive_card_paid_body.png" alt="V4 declined_card_new_strategy" loading="lazy"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- cancel_paid -->
+      <div class="email-card">
+        <div class="email-card-header">
+          <span class="email-card-name">cancel_paid</span>
+          <div class="email-card-meta">
+            <span class="badge badge-vol">~843/wk</span>
+            <span class="badge badge-updated">✓ V4 Updated</span>
+          </div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-card-details">
+            <div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-value"><strong>Immediately</strong> on paid cancel WITH refund.</span></div>
+            <div class="detail-row"><span class="detail-label">V4 Copy</span><span class="detail-value">✅ Updated — "Your membership has been canceled". Refund receipt (date, amount, payment method), "Manage membership" CTA, feedback section. Copy uses XXXX/$XX.XX template vars.</span></div>
+            <div class="detail-row"><span class="detail-label">Figma</span><span class="detail-value">Cancelled_paid</span></div>
+          </div>
+          <div class="screenshots-row">
+            <div class="screenshot-col"><span class="screenshot-col-label v3">V3 Current</span><a href="https://drive.google.com/file/d/11BtcJm-S2ZqEzeqc5cVz3P8j8amIB98S/view" target="_blank"><img src="https://lh3.googleusercontent.com/d/11BtcJm-S2ZqEzeqc5cVz3P8j8amIB98S" alt="V3 cancel_paid" loading="lazy"></a></div>
+            <div class="screenshot-col"><span class="screenshot-col-label v4">V4 Figma</span><img src="v4/m3_cancel_paid_body.png" alt="V4 cancel_paid" loading="lazy"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- monthly_12month_renewal (NEW) -->
+      <div class="email-card">
+        <div class="email-card-header">
+          <span class="email-card-name">monthly_12month_renewal</span>
+          <div class="email-card-meta">
+            <span class="badge badge-new">✦ New in V4</span>
+            <span class="badge badge-updated">✓ V4 Updated</span>
+          </div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-card-details">
+            <div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-value"><strong>12-month anniversary</strong> of monthly plan. Reminder that membership renews soon.</span></div>
+            <div class="detail-row"><span class="detail-label">V4 Copy</span><span class="detail-value">✅ Updated — "Your Instacart+ membership renews soon". Renewal date, $9.99 monthly price, cancel path, benefits. Same layout as upcoming_renewal. <strong>No V3 equivalent.</strong></span></div>
+            <div class="detail-row"><span class="detail-label">Figma</span><span class="detail-value">Paid monthly - 12month_renewal</span></div>
+          </div>
+          <div class="screenshots-row">
+            <div class="screenshot-col"><span class="screenshot-col-label v3">V3 Current</span><div class="no-screenshot amber">No V3 equivalent — new email type</div></div>
+            <div class="screenshot-col"><span class="screenshot-col-label v4">V4 Figma</span><img src="v4/m3_monthly_12month_body.png" alt="V4 monthly 12month" loading="lazy"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- cancel_paid_no_refund ⚠ BLANK -->
+      <div class="email-card" style="border-color: var(--amber);">
+        <div class="email-card-header" style="background: var(--amber-bg);">
+          <span class="email-card-name">cancel_paid_no_refund</span>
+          <div class="email-card-meta">
+            <span class="badge badge-vol">~723/wk</span>
+            <span class="badge badge-blank">⚠ V4 Blank</span>
+          </div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-card-details">
+            <div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-value"><strong>Immediately</strong> on paid cancel WITHOUT refund (past refund window).</span></div>
+            <div class="detail-row"><span class="detail-label">V4 Copy</span><span class="detail-value" style="color:var(--amber);font-weight:600">⚠ BLANK — Figma frame "cancelled_paid_norefund" exists but contains no design. Design work not started.</span></div>
+          </div>
+          <div class="screenshots-row">
+            <div class="screenshot-col"><span class="screenshot-col-label v3">V3 Current</span><a href="https://drive.google.com/file/d/19vF4WDhtx-sI_G-u6Y2Jrdk_8h06FIuV/view" target="_blank"><img src="https://lh3.googleusercontent.com/d/19vF4WDhtx-sI_G-u6Y2Jrdk_8h06FIuV" alt="V3 cancel_paid_no_refund" loading="lazy"></a></div>
+            <div class="screenshot-col"><span class="screenshot-col-label v4">V4 Figma</span><div class="no-screenshot amber">⚠️<br>Frame exists — blank.<br>No V4 design yet.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- end_paid ⚠ BLANK -->
+      <div class="email-card" style="border-color: var(--amber);">
+        <div class="email-card-header" style="background: var(--amber-bg);">
+          <span class="email-card-name">end_paid</span>
+          <div class="email-card-meta">
+            <span class="badge badge-vol">~707/wk</span>
+            <span class="badge badge-blank">⚠ V4 Blank</span>
+          </div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-card-details">
+            <div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-value"><strong>Before/at end date.</strong> Autorenew OFF. Prompts user to add payment.</span></div>
+            <div class="detail-row"><span class="detail-label">V4 Copy</span><span class="detail-value" style="color:var(--amber);font-weight:600">⚠ BLANK — Figma frame "end_paid" exists but contains no design. Design work not started.</span></div>
+          </div>
+          <div class="screenshots-row">
+            <div class="screenshot-col"><span class="screenshot-col-label v3">V3 Current</span><a href="https://drive.google.com/file/d/1Df6sYVrbdA7PKBe9wkKzChXZnxgJuxcC/view" target="_blank"><img src="https://lh3.googleusercontent.com/d/1Df6sYVrbdA7PKBe9wkKzChXZnxgJuxcC" alt="V3 end_paid" loading="lazy"></a></div>
+            <div class="screenshot-col"><span class="screenshot-col-label v4">V4 Figma</span><div class="no-screenshot amber">⚠️<br>Frame exists — blank.<br>No V4 design yet.</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =================== NOT IN FIGMA =================== -->
+  <div class="milestone-section">
+    <div class="milestone-header other"><span class="pill">Not in Figma</span> Emails with No V4 Design <span class="milestone-desc">No Figma section. Needs scoping decision.</span></div>
+    <div class="email-grid">
+
+      <!-- declined_card (legacy) -->
+      <div class="email-card">
+        <div class="email-card-header">
+          <span class="email-card-name">declined_card</span> <span style="font-size:12px;color:var(--text-2)">(legacy)</span>
+          <div class="email-card-meta"><span class="badge badge-missing">✗ No V4</span></div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-card-details">
+            <div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-value"><strong>On charge decline</strong> (older strategy). May be superseded by <code>declined_card_new_strategy</code> (which IS in Figma M3).</span></div>
+          </div>
+          <div class="screenshots-row">
+            <div class="screenshot-col"><span class="screenshot-col-label v3">V3 Current</span><a href="https://drive.google.com/file/d/1ylu0iP-A3NN20o1F89MScleoYV-payMC/view" target="_blank"><img src="https://lh3.googleusercontent.com/d/1ylu0iP-A3NN20o1F89MScleoYV-payMC" alt="V3 declined_card" loading="lazy"></a></div>
+            <div class="screenshot-col"><span class="screenshot-col-label v4">V4 Figma</span><div class="no-screenshot red">✗<br>Not in Figma.<br>Legacy — likely superseded.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- start_coupon -->
+      <div class="email-card">
+        <div class="email-card-header">
+          <span class="email-card-name">start_coupon</span>
+          <div class="email-card-meta"><span class="badge badge-missing">✗ No V4</span></div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-card-details">
+            <div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-value"><strong>On coupon activation.</strong> Service-recovery comp membership (14 days).</span></div>
+          </div>
+          <div class="screenshots-row">
+            <div class="screenshot-col"><span class="screenshot-col-label v3">V3 Current</span><a href="https://drive.google.com/file/d/1L3nySmp_2J7PX4W5esJTduJ_9X2dJvql/view" target="_blank"><img src="https://lh3.googleusercontent.com/d/1L3nySmp_2J7PX4W5esJTduJ_9X2dJvql" alt="V3 start_coupon" loading="lazy"></a></div>
+            <div class="screenshot-col"><span class="screenshot-col-label v4">V4 Figma</span><div class="no-screenshot red">✗<br>Not in Figma.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- start_partnership_coupon -->
+      <div class="email-card">
+        <div class="email-card-header">
+          <span class="email-card-name">start_partnership_coupon</span>
+          <div class="email-card-meta"><span class="badge badge-missing">✗ No V4</span></div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-card-details">
+            <div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-value"><strong>On partner activation.</strong> Partnership trial (e.g. Costco Express).</span></div>
+          </div>
+          <div class="screenshots-row">
+            <div class="screenshot-col"><span class="screenshot-col-label v3">V3 Current</span><a href="https://drive.google.com/file/d/1att6OB95dQk6fj8mqyBYghAd8E_4B-k1/view" target="_blank"><img src="https://lh3.googleusercontent.com/d/1att6OB95dQk6fj8mqyBYghAd8E_4B-k1" alt="V3 start_partnership_coupon" loading="lazy"></a></div>
+            <div class="screenshot-col"><span class="screenshot-col-label v4">V4 Figma</span><div class="no-screenshot red">✗<br>Not in Figma.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- costco_member_without_mp_account -->
+      <div class="email-card">
+        <div class="email-card-header">
+          <span class="email-card-name">costco_member_without_mp_account</span>
+          <div class="email-card-meta"><span class="badge badge-vol">~99/wk</span> <span class="badge badge-missing">✗ No V4</span></div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-card-details">
+            <div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-value"><strong>On account linking.</strong> Costco member links account with no IC+.</span></div>
+          </div>
+          <div class="screenshots-row">
+            <div class="screenshot-col"><span class="screenshot-col-label v3">V3 Current</span><a href="https://drive.google.com/file/d/1v5SVJ4G9b8gXMWaC7ffn7E6XItojCbsH/view" target="_blank"><img src="https://lh3.googleusercontent.com/d/1v5SVJ4G9b8gXMWaC7ffn7E6XItojCbsH" alt="V3 costco_member_without_mp_account" loading="lazy"></a></div>
+            <div class="screenshot-col"><span class="screenshot-col-label v4">V4 Figma</span><div class="no-screenshot red">✗<br>Not in Figma.<br>Outside SEE scope.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- linking_user -->
+      <div class="email-card">
+        <div class="email-card-header">
+          <span class="email-card-name">linking_user</span>
+          <div class="email-card-meta"><span class="badge badge-vol">~72/wk</span> <span class="badge badge-missing">✗ No V4</span></div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-card-details">
+            <div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-value"><strong>On backfill job.</strong> Membership backfill links user.</span></div>
+          </div>
+          <div class="screenshots-row">
+            <div class="screenshot-col"><span class="screenshot-col-label v3">V3 Current</span><a href="https://drive.google.com/file/d/17U9Ld0JNahKfapl2I6NNeRnKeQamM82U/view" target="_blank"><img src="https://lh3.googleusercontent.com/d/17U9Ld0JNahKfapl2I6NNeRnKeQamM82U" alt="V3 linking_user" loading="lazy"></a></div>
+            <div class="screenshot-col"><span class="screenshot-col-label v4">V4 Figma</span><div class="no-screenshot red">✗<br>Not in Figma.<br>Outside SEE scope.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- less_than_30 variants -->
+      <div class="email-card">
+        <div class="email-card-header">
+          <span class="email-card-name">less_than_30_upcoming_renewal</span>
+          <div class="email-card-meta"><span class="badge badge-missing">✗ No V4</span></div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-card-details">
+            <div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-value"><strong>7-day reminder,</strong> savings &lt; $30. Shows 30-day adjustment window.</span></div>
+          </div>
+          <div class="screenshots-row">
+            <div class="screenshot-col"><span class="screenshot-col-label v3">V3 Current</span><a href="https://drive.google.com/file/d/18jB-vHnKjL3fnaDaJ3mFRoMOCMrKYpXQ/view" target="_blank"><img src="https://lh3.googleusercontent.com/d/18jB-vHnKjL3fnaDaJ3mFRoMOCMrKYpXQ" alt="V3 less_than_30_upcoming" loading="lazy"></a></div>
+            <div class="screenshot-col"><span class="screenshot-col-label v4">V4 Figma</span><div class="no-screenshot red">✗<br>Not in Figma.<br>May be merged into upcoming_renewal V4.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- savings + secondary variants with no screenshot -->
+      <div class="email-card" style="border-color: var(--red);">
+        <div class="email-card-header" style="background: var(--red-bg);">
+          <span class="email-card-name" style="font-size:12px">upcoming_renewal_savings · end_trial_autorenew_savings · upcoming_secondary_renewal</span>
+          <div class="email-card-meta"><span class="badge badge-missing">✗ No V4</span> <span class="badge badge-missing">✗ No V3 Screenshot</span></div>
+        </div>
+        <div class="email-card-body">
+          <div class="email-card-details">
+            <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value"><strong>3 emails</strong> with neither V3 screenshot nor V4 design. Savings variants are subsets of their parent emails. The 30-day secondary renewal is a separate job (<code>SendUpcomingSecondaryRenewalEmailsJob</code>). All need to be captured and scoped.</span></div>
+          </div>
+          <div class="screenshots-row">
+            <div class="screenshot-col"><span class="screenshot-col-label v3">V3 Current</span><div class="no-screenshot red">✗<br>No V3 screenshot.<br>Needs capture from staging.</div></div>
+            <div class="screenshot-col"><span class="screenshot-col-label v4">V4 Figma</span><div class="no-screenshot red">✗<br>Not in Figma.</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footnotes">
+    <p><strong>V4 design status summary:</strong> Of 22 V3 emails, 15 have V4 designs in Figma (13 with updated copy, 2 with blank frames). 7 are not in Figma at all. 2 new email types exist only in V4 (successful_retry, monthly_12month_renewal).</p>
+    <p><strong>Milestone mapping (from Figma):</strong> M1 = Trial lifecycle (4, all launched). M2 = Paid start + confirmations (4, in-flight). M3 = Paid renewal, cancel, card issues (7 frames, 5 with designs + 2 blank). Note: Figma milestone assignments differ from earlier doc-based estimates.</p>
+    <p><strong>Charge gate emails (P1):</strong> <code>upcoming_renewal</code> and <code>inactive_card</code> (paid) are charge gates — SEE won't renew until the reminder is confirmed delivered. Both have V4 designs in Figma M3, but templates are not yet built. This is the MS4 blocker.</p>
+    <p><strong>2 blank V4 frames:</strong> <code>cancel_paid_no_refund</code> (~723/wk) and <code>end_paid</code> (~707/wk) have Figma frames but no design work. Combined ~1,430 emails/week affected.</p>
+    <p><strong>Volume methodology:</strong> Weekly estimates derived from 15-day spans in Chao's blocker doc (÷ 15 × 7).</p>
+    <p><strong>V3 screenshots:</strong> Images load from Google Drive — you need to be logged into your Google account. Click any image to open in Drive.</p>
+    <p><strong>V4 screenshots:</strong> Downloaded from Figma file <a href="https://www.figma.com/design/nzhkBUCl2sV3wLbiFcIVl4/Transactional-emails-2.0?node-id=1885-24375&m=dev" style="color:var(--purple)">Transactional emails 2.0</a>, page "FInal ✅", node 1885:24375. Loaded as local files.</p>
+  </div>
+
+  <div class="sources">
+    <strong>Sources:</strong>
+    <a href="https://drive.google.com/drive/u/0/folders/1OP0AJLqC4an_wxtLVqiD2zTas1ETbO1D">V3 Mailer Screenshots</a> ·
+    <a href="https://www.figma.com/design/nzhkBUCl2sV3wLbiFcIVl4/Transactional-emails-2.0?node-id=1885-24375&m=dev">Figma V4 Designs</a> ·
+    <a href="https://instacart.atlassian.net/wiki/spaces/Platform/pages/7177633817">SEE Blocker Doc</a> ·
+    <a href="https://docs.google.com/document/d/1828H7nzD1za4fxKPqS-BWN1T9x-jE75kVfXL8bsyavc">IC+ Renewal Q&A</a> ·
+    <a href="https://docs.google.com/document/d/1N_ZhHl0bub9k8HWZFcoZJEifR7A5bbpFmXFuvKDiqB8">ACP Compliance Review</a>
+    <br>Last updated: Oct 5, 2026
+  </div>
+</div>
